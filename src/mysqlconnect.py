@@ -3,10 +3,14 @@
 # pip3 install mysql-connector-python
 
 import mysql.connector
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
 
 # connect to database
 # You can get the Hostname and Password from the connection information section of Mysql 
-connection = mysql.connector.connect(user='root', password='<replace with your Mysql password>',host='<replace with your Mysql hostname>',database='sales')
+connection = mysql.connector.connect(user=os.getenv('MYSQL_USER'), password=os.getenv('MYSQL_PASSWORD'),host=os.getenv('MYSQL_HOST'),database='sales')
 
 # create cursor
 
