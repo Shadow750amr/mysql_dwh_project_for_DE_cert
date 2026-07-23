@@ -55,19 +55,23 @@ print("Last row id on production datawarehouse = ", last_row_id)
 
 def get_latest_records(rowid):
     cursor = mysql_conn.cursor()
-    cursor.execute(f'SELECT rowid FROM sales.sales_data WHERE rowid >= {rowid}')
+    cursor.execute(f'SELECT rowid,product_id,customer_id,quantity FROM sales.sales_data WHERE rowid >= {rowid}')
     return cursor.fetchall()
-
 
 new_records = get_latest_records(last_row_id)
 
 print("New rows on staging datawarehouse = ", len(new_records))
 
+
 # Insert the additional records from MySQL into DB2 or PostgreSql data warehouse.
 # The function insert_records must insert all the records passed to it into the sales_data table in IBM DB2 database or PostgreSql.
 
 def insert_records(records):
-	pass
+    cursor = psql_conn.cursor()
+    query = '''INSERT INTO sales_data (rowid,product_id,customer_id,quantity) VALUES (%s, %s, %s, %s)'''
+    cursor.executemany(query,records)
+    psql_conn.commit()
+    cursor.close()
 
 insert_records(new_records)
 print("New rows inserted into production datawarehouse = ", len(new_records))
@@ -77,3 +81,6 @@ print("New rows inserted into production datawarehouse = ", len(new_records))
 # disconnect from DB2 or PostgreSql data warehouse 
 
 # End of program
+
+
+
